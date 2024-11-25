@@ -99,17 +99,18 @@ df["발행일"] = pd.to_datetime(df["발행일"])
 df["만기일"] = pd.to_datetime(df["만기일"])
 
 
-# 만기그룹 추가
-def assign_maturity_group(row):
-    if row["만기일"].year == 2025:
-        return "만기 1년"
-    elif row["만기일"].year == 2026:
-        return "만기 2년"
-    else:
-        return "장기"
+# 발행시 만기 계산 (연단위)
+df["발행시만기"] = ((df["만기일"] - df["발행일"]).dt.days / 365.25).round(2)
 
+# 현재 시점 기준 잔존만기 계산
+current_date = pd.Timestamp("2024-11-25")  # 현재 날짜
+df["잔존만기"] = ((df["만기일"] - current_date).dt.days / 365.25).round(2)
 
-df["만기그룹"] = df.apply(assign_maturity_group, axis=1)
+# 만기그룹은 발행시만기 기준으로 표시
+df["만기그룹"] = df["발행시만기"].astype(str) + "년"
+
+# 만기 순으로 정렬
+df = df.sort_values(["발행시만기"])
 
 # CSV 파일로 저장
 df.to_csv("data/raw/bond_info/woori_bond_info.csv", index=False, encoding="utf-8")
@@ -119,5 +120,14 @@ print("\n데이터 샘플:")
 print(df.head())
 print("\n만기그룹별 통계:")
 print(
-    df.groupby("만기그룹").agg({"종목명": "count", "발행액": "sum", "표면금리": "mean"})
+    df.groupby("만기그룹")
+    .agg(
+        {
+            "종목명": "count",
+            "발행액": ["sum", "mean"],
+            "표면금리": ["mean", "min", "max"],
+            "잔존만기": ["mean", "min", "max"],
+        }
+    )
+    .round(2)
 )
