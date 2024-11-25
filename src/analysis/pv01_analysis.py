@@ -1,10 +1,7 @@
 from datetime import datetime
 import pandas as pd
-import numpy as np
 from src.utils.data_loader import (
     load_bond_info,
-    load_govt_rates,
-    load_spread_data,
     load_individual_bond_data,
 )
 
