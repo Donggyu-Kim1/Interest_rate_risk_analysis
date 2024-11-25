@@ -36,7 +36,15 @@ def load_spread_data():
     return df
 
 
-def load_individual_bond_data(bond_code):
+def get_bond_codes():
+    """채권 시리즈 코드 목록 반환"""
+    df = load_bond_info()
+    # 종목명에서 'O-O' 또는 'O' 패턴 추출
+    series_codes = df["종목명"].str.extract(r"우리금융지주(\d+(?:-\d+)?)")
+    return series_codes[0].unique().tolist()
+
+
+def load_individual_bond_data(series_code):
     """개별 채권 시장 데이터 로드"""
     root_dir = get_project_root()
     file_path = (
@@ -44,8 +52,19 @@ def load_individual_bond_data(bond_code):
         / "data"
         / "processed"
         / "market_data"
-        / f"woori_bond_data_{bond_code}.csv"
+        / f"woori_bond_data_{series_code}.csv"
     )
 
     df = pd.read_csv(file_path, parse_dates=["일자"])
     return df
+
+
+def load_all_bond_data():
+    """모든 채권 데이터 로드"""
+    series_codes = get_bond_codes()
+    all_data = {}
+
+    for code in series_codes:
+        all_data[code] = load_individual_bond_data(code)
+
+    return all_data
