@@ -93,6 +93,7 @@ rfc3986-validator==0.1.1
 # Editable Git install with no remote (risk_management==0.0.0)
 -e c:\users\kims0\onedrive\πŸ≈¡ »≠∏È\risk_management
 rpds-py==0.21.0
+scipy==1.14.1
 seaborn==0.13.2
 Send2Trash==1.8.3
 setuptools==75.6.0
