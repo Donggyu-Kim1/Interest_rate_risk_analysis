@@ -4,7 +4,7 @@ import seaborn as sns
 
 def set_plot_style():
     """기본 plot 스타일 설정"""
-    plt.style.use("seaborn")
+    sns.set_style("whitegrid")  # seaborn의 스타일 직접 설정
     sns.set_palette("husl")
 
     # 폰트 설정

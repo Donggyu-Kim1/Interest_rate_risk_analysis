@@ -49,6 +49,39 @@ class MonteCarloVaRAnalysis:
         df["daily_return"] = df.groupby("bond_name")["price"].pct_change()
         return df.dropna()
 
+    def run_simulation(self, bond_name, n_simulations=10000, horizon_days=10):
+        """특정 채권에 대한 Monte Carlo 시뮬레이션 실행"""
+        # 채권 데이터 가져오기
+        bond_data = self.get_bond_market_data()
+        bond_data = bond_data[bond_data["bond_name"] == bond_name]
+
+        # 수익률 계산을 위한 기초 통계량
+        daily_returns = self.get_bond_returns(bond_data)
+        mean_return = daily_returns["daily_return"].mean()
+        std_return = daily_returns["daily_return"].std()
+
+        # 정규성 검정
+        _, p_value = stats.normaltest(daily_returns["daily_return"])
+
+        if p_value < 0.05:
+            # 정규성 기각시 t-분포 사용
+            degrees_of_freedom = 5
+            simulated_returns = stats.t.rvs(
+                df=degrees_of_freedom,
+                loc=mean_return * horizon_days,
+                scale=std_return * np.sqrt(horizon_days),
+                size=n_simulations,
+            )
+        else:
+            # 정규성 채택시 정규분포 사용
+            simulated_returns = np.random.normal(
+                mean_return * horizon_days,
+                std_return * np.sqrt(horizon_days),
+                n_simulations,
+            )
+
+        return simulated_returns
+
     def calculate_var_metrics(
         self,
         bond_data: pd.DataFrame,

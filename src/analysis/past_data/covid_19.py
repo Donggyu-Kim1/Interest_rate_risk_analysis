@@ -32,7 +32,8 @@ class CovidBondAnalysis:
                AVG(국고채권1년) OVER (ORDER BY 일자 ROWS BETWEEN {window} PRECEDING AND CURRENT ROW) as MA_1Y,
                AVG(국고채권3년) OVER (ORDER BY 일자 ROWS BETWEEN {window} PRECEDING AND CURRENT ROW) as MA_3Y,
                AVG(국고채권5년) OVER (ORDER BY 일자 ROWS BETWEEN {window} PRECEDING AND CURRENT ROW) as MA_5Y,
-               국고채권1년, 국고채권3년, 국고채권5년
+               AVG(국고채권10년) OVER (ORDER BY 일자 ROWS BETWEEN {window} PRECEDING AND CURRENT ROW) as MA_10Y,
+               국고채권1년, 국고채권3년, 국고채권5년, 국고채권10년
         FROM govt_bond_rates
         WHERE 일자 >= '{start_date}'
         AND 일자 <= '{end_date}'
@@ -56,9 +57,11 @@ class CovidBondAnalysis:
                 국고채권1년,
                 국고채권3년,
                 국고채권5년,
+                국고채권10년,
                 LAG(국고채권1년) OVER (ORDER BY 일자) as prev_1y,
                 LAG(국고채권3년) OVER (ORDER BY 일자) as prev_3y,
-                LAG(국고채권5년) OVER (ORDER BY 일자) as prev_5y
+                LAG(국고채권5년) OVER (ORDER BY 일자) as prev_5y,
+                LAG(국고채권10년) OVER (ORDER BY 일자) as prev_10y
             FROM govt_bond_rates
             WHERE 일자 >= '{start_date}'
             AND 일자 <= '{end_date}'
@@ -67,11 +70,13 @@ class CovidBondAnalysis:
             일자,
             ROUND(국고채권1년 - prev_1y, 3) as drop_1y,
             ROUND(국고채권3년 - prev_3y, 3) as drop_3y,
-            ROUND(국고채권5년 - prev_5y, 3) as drop_5y
+            ROUND(국고채권5년 - prev_5y, 3) as drop_5y,
+            ROUND(국고채권10년 - prev_10y, 3) as drop_10y
         FROM rate_changes
         WHERE (국고채권1년 - prev_1y < {drop_threshold})
            OR (국고채권3년 - prev_3y < {drop_threshold})
            OR (국고채권5년 - prev_5y < {drop_threshold})
+           OR (국고채권10년 - prev_10y < {drop_threshold})
         ORDER BY 일자
         """
 

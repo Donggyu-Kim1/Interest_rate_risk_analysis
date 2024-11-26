@@ -10,6 +10,9 @@ src/analysis/VaR.py
 src/analysis/__init__.py
 src/analysis/market_environment.py
 src/analysis/pv01_analysis.py
+src/analysis/past_data/__init__.py
+src/analysis/past_data/covid_19.py
+src/analysis/past_data/inflation_liquidity.py
 src/analysis/scenario/__init__.py
 src/analysis/scenario/bad_scenario.py
 src/analysis/scenario/baseline_scenario.py
@@ -27,4 +30,15 @@ src/utils/data_loader.py
 src/utils/date_utils.py
 src/utils/db_queries.py
 src/utils/plot_config.py
+src/visualization/VaR.py
 src/visualization/__init__.py
+src/visualization/market_environment.py
+src/visualization/pv01_analysis.py
+src/visualization/past_data/__init__.py
+src/visualization/past_data/covid_19.py
+src/visualization/past_data/inflation_liquidity.py
+src/visualization/scenario/__init__.py
+src/visualization/scenario/bad_scenario.py
+src/visualization/scenario/baseline_scenario.py
+src/visualization/scenario/stress_test.py
+src/visualization/scenario/worst_scenario.py
