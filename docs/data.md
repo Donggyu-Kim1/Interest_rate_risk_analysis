@@ -1,106 +1,103 @@
-시계열 데이터 범위
+# csv 파일 데이터 ERD
 
+```mermaid
+erDiagram
+    BOND_INFO ||--o{ BOND_MARKET_DATA : "has"
+    BOND_INFO ||--o{ BOND_SPREADS : "has"
+    GOVT_BOND_RATES ||--o{ BOND_SPREADS : "references"
+    
+    BOND_INFO {
+        string bond_name PK "종목명"
+        string isin_code UK "표준코드"
+        date issue_date "발행일"
+        date maturity_date "만기일"
+        decimal issue_amount "발행액"
+        decimal coupon_rate "표면금리"
+        string interest_type "이자지급방법"
+        int interest_period "이자지급주기"
+        decimal initial_maturity "발행시만기"
+        decimal remaining_maturity "잔존만기"
+        string maturity_group "만기그룹"
+    }
 
-기본 분석 기간: 최근 5년간 데이터 (2019-2024)
+    GOVT_BOND_RATES {
+        date trade_date PK "일자"
+        decimal govt_1y "국고채권(1년)"
+        decimal govt_3y "국고채권(3년)"
+        decimal govt_5y "국고채권(5년)"
+        decimal govt_10y "국고채권(10년)"
+        decimal mss_91d "통안증권(91일)"
+        decimal mss_1y "통안증권(1년)"
+        decimal mss_2y "통안증권(2년)"
+    }
 
-금리 상승기와 하락기를 모두 포함하여 다양한 시장 환경 분석 가능
-COVID-19 전후 금리 환경 변화 영향 분석 가능
-최근의 고금리 기조 영향 분석 가능
+    BOND_MARKET_DATA {
+        date trade_date PK "일자"
+        string bond_name PK "종목명"
+        decimal yield "채권평가사 평균수익률_수익률"
+        decimal yield_change "채권평가사 평균수익률_대비"
+        decimal price "채권평가사 평균가격_가격"
+        decimal price_change "채권평가사 평균가격_대비"
+    }
 
+    BOND_SPREADS {
+        date trade_date PK "일자"
+        string bond_name PK "종목명"
+        decimal initial_maturity "발행시만기"
+        decimal remaining_maturity "잔존만기"
+        decimal corp_yield "회사채수익률"
+        decimal govt_yield "국고채수익률"
+        decimal spread "스프레드"
+    }
+```
 
+# MySQL DB ERD
 
+```mermaid
+erDiagram
+    BOND_INFO ||--o{ WOORI_BOND_DATA : "has"
+    BOND_INFO ||--o{ SPREAD_DATA : "has"
+    GOVT_BOND_RATES ||--o{ SPREAD_DATA : "references"
 
-우리금융지주 회사채 데이터
+    BOND_INFO {
+        VARCHAR(20) bond_name PK "종목명"
+        VARCHAR(12) isin_code "표준코드"
+        date issue_date "발행일"
+        date maturity_date "만기일"
+        int issue_amount "발행액"
+        float coupon_rate "표면금리"
+        string interest_type "이자지급방법"
+        int interest_period "이자지급주기"
+        float initial_maturity "발행시만기"
+        float remaining_maturity "잔존만기"
+        string maturity_group "만기그룹"
+    }
 
+    GOVT_BOND_RATES {
+        date trade_date PK "일자"
+        float govt_1y "국고채권1년"
+        float govt_3y "국고채권3년"
+        float govt_5y "국고채권5년"
+        float govt_10y "국고채권10년"
+        float mss_91d "통안증권91일"
+        float mss_1y "통안증권1년"
+        float mss_2y "통안증권2년"
+    }
 
-대상: 현재 잔존 만기가 있는 모든 회사채
-필요 데이터 항목별 상세:
+    WOORI_BOND_DATA {
+        date trade_date PK "일자"
+        VARCHAR(20) bond_name PK "종목명"
+        float yield "FLOAT 평균수익률"
+        float yield_change "FLOAT 수익률대비"
+        float price "FLOAT 평균가격"
+        float price_change "FLOAT 가격대비"
+    }
 
-발행정보: 발행일, 만기일, 발행금액, 표면금리, 상환구조
-거래정보: 일별 거래량, 거래금액
-가격정보: 일별 종가, 호가 스프레드
-수익률: 일별 최종호가수익률, 체결수익률
-
-
-
-
-금리 관련 데이터
-
-
-수집 주기: 일별 데이터
-필요 항목:
-
-국고채 금리: 1년, 3년, 5년, 10년 만기
-통화안정증권 금리: 전체 만기 구간
-CD금리, MMR 등 단기금리
-기준금리 변동 내역
-
-
-
-
-신용 및 스프레드 데이터
-
-
-수집 주기: 주별 데이터
-필요 항목:
-
-우리금융지주 신용등급 변동 내역
-만기별 신용스프레드
-금융지주사 평균 신용스프레드
-채권시장 전반의 신용스프레드 지표
-
-
-
-
-스트레스 테스트용 데이터
-
-
-과거 금융위기 기간(2008년 금융위기, 2020년 코로나 위기) 포함
-필요 항목:
-
-일별 금리 변동성
-극단적 금리 변동 사례
-스프레드 급등 사례
-시장 유동성 지표
-
-
-
-
-비교분석용 데이터
-
-
-대상: 주요 금융지주사 5개사
-기간: 최근 3년
-필요 항목:
-
-회사채 발행 내역
-만기별 발행금리
-신용스프레드
-PV01 산출 결과
-
-
-
-
-데이터 정제 기준
-
-
-결측치 처리: 직전 거래일 데이터로 보완
-이상치 처리: ±3σ 범위 벗어나는 데이터 검토
-유동성 기준: 일평균 거래량 1억원 이상 종목
-만기 구분: 단기(1-3년), 중기(3-5년), 장기(5년 이상)
-
-
-최소 데이터 요구사항
-
-
-일별 관측치: 최소 1,000개 이상
-종목 수: 최소 10개 이상
-만기별 분포: 각 만기 구간당 최소 3종목 이상
-거래 빈도: 주 1회 이상 거래 발생
-
-이러한 구체적인 데이터 요구사항을 바탕으로:
-
-통계적 유의성 확보 가능
-다양한 시장 환경에서의 검증 가능
-실무적 활용가치가 높은 분석 결과 도출 가능
-향후 연구의 확장성 확보 가능
+    SPREAD_DATA {
+        date trade_date PK "DATE 일자"
+        VARCHAR(20) bond_name PK "종목명"
+        float corp_yield "FLOAT 회사채수익률"
+        float govt_yield "FLOAT 국고채수익률"
+        float spread "FLOAT 스프레드"
+    }
+```
