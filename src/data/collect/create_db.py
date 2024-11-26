@@ -1,7 +1,10 @@
 import pymysql
+from config.config_db import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_CHARSET
 
 try:
-    conn = pymysql.connect(user="root", passwd="3406", host="localhost", charset="utf8")
+    conn = pymysql.connect(
+        user=DB_USER, passwd=DB_PASSWORD, host=DB_HOST, charset=DB_CHARSET
+    )
 
     mycursor = conn.cursor()
 

@@ -3,16 +3,17 @@ import numpy as np
 import pymysql
 from pathlib import Path
 import re
+from config.config_db import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_CHARSET
 
 
 def create_connection():
     """데이터베이스 연결 생성"""
     return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="3406",
-        db="woori_bond_db",
-        charset="utf8",
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        db=DB_NAME,
+        charset=DB_CHARSET,
     )
 
 

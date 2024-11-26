@@ -2,12 +2,13 @@ from sqlalchemy import create_engine
 import pandas as pd
 from typing import Optional, Union, Dict, List, Any
 from datetime import datetime
+from config.config_db import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_CHARSET
 
 
 class WooriBondDB:
     def __init__(self):
         self.engine = create_engine(
-            "mysql+pymysql://root:3406@localhost/woori_bond_db?charset=utf8"
+            f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}?charset={DB_CHARSET}"
         )
 
     def execute_query(self, query: str) -> pd.DataFrame:
