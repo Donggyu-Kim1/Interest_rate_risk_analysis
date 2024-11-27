@@ -1,4 +1,4 @@
-# 우리금융지주 회사채의 PV01을 활용한 금리리스크 분석 프로젝트
+# 우리금융지주 회사채 금리리스크 분석 프로젝트
 
 ## 1. 주제 및 목표
 
@@ -298,9 +298,9 @@ erDiagram
 
 ### 1. 시장환경분석
 
-![수익률_곡선](docs\analysis\market_environment\yield_curves.png)
-![신용_스프레드_추이](docs\analysis\market_environment\credit_spreads.png)
-![변동성_추이](docs\analysis\market_environment\rate_volatility.png)
+![yield_curves](https://github.com/user-attachments/assets/80ec2d27-bb50-4a3a-bc16-02c1f3671f27)
+![credit_spreads](https://github.com/user-attachments/assets/aa999954-54f0-43fc-8496-520c733822b3)
+![rate_volatility](https://github.com/user-attachments/assets/6f7deae2-1fe9-4f40-9ad1-b4f1c93edf22)
 
 #### 금리곡선 특성
 
@@ -323,7 +323,7 @@ erDiagram
 
 ### 2. PV01 분석
 
-![pv01](docs\analysis\pv01\pv01_per_billion.png)
+![pv01_per_billion](https://github.com/user-attachments/assets/58e1670d-584a-4eb2-8127-52b6bb3d810c)
 
 #### 만기별 PV01 분포
 
@@ -351,8 +351,8 @@ erDiagram
 
 #### COVID-19
 
-![금리추이](docs\analysis\covid_period\lowest_rate_period.png)
-![금리하락](docs\analysis\covid_period\summary_stats.png)
+![lowest_rate_period](https://github.com/user-attachments/assets/2de4d887-486d-4e7c-acf3-b642e9213a28)
+![summary_stats](https://github.com/user-attachments/assets/3f603079-569e-49b2-b38d-835143fb6674)
 
 - 금리 최저점: 2020년 8월 27일 (3년물 기준 0.852%)
 - 금리 하락이 두드러진 시기: 2020년 1-3월
@@ -360,8 +360,8 @@ erDiagram
 
 #### 인플레이션/유동성 위기 시기
 
-![inflation_rate_trend](docs\analysis\inflation_period\inflation_rate_trends.png)
-![summary_stats](docs\analysis\inflation_period\summary_stats.png)
+![inflation_rate_trends](https://github.com/user-attachments/assets/925f827a-ef5a-4321-a80b-6ce7ddc432fc)
+![summary_stats](https://github.com/user-attachments/assets/1b56180d-71b6-45fc-aa97-8cd2defa804d)
 
 - 금리 최고점: 2022년 11월 8일 (3년물 기준 4.156%)
 - 급격한 금리 상승: 2022년 9월 26일(레고랜드 신용경색 사태)
@@ -376,9 +376,9 @@ erDiagram
 - 만기가 길수록 금리 변동성이 더 크게 나타남
 
 #### 채권 포트폴리오 STRESS TEST 결과
-![bond_loss_distribution](docs\analysis\stress_test\bond_loss_distribution.png)
-![maturity_vulnerability](docs\analysis\stress_test\maturity_vulnerability.png)
-![scenario_impact](docs\analysis\stress_test\scenario_impact.png)
+![bond_loss_distribution](https://github.com/user-attachments/assets/1da47a31-58c1-4e76-bf5a-694bf7db6c1f)
+![maturity_vulnerability](https://github.com/user-attachments/assets/c49e0a8b-8558-4ccb-8d86-6ef6408531bf)
+![scenario_impact](https://github.com/user-attachments/assets/c50c740c-4829-431a-86b1-b8c7faab1a63)
 
 #### 시나리오별 최대 손실 시점
 
@@ -424,26 +424,26 @@ erDiagram
 
 #### BASELINE 시나리오 분석 결과
 
-![](docs\analysis\scenarios\baseline_rate_scenario.png)
-![](docs\analysis\scenarios\baseline_maturity_analysis.png)
-![](docs\analysis\scenarios\baseline_price_impact.png)
+![baseline_rate_scenario](https://github.com/user-attachments/assets/2782e25a-987b-43a4-9541-0fad5445054f)
+![baseline_maturity_analysis](https://github.com/user-attachments/assets/a058ecf0-eab2-4d41-a480-400189e71fa6)
+![baseline_price_impact](https://github.com/user-attachments/assets/25e4eded-fc77-48f7-a24a-e50f1bbc8d0a)
 
 - 금리 인하는 채권 수익률 상승에 긍정적인 영향을 줌
 - 채권의 변동성은 만기가 길수록 큼
 
 #### BAD 시나리오 분석 결과
-![](docs\analysis\scenarios\bad_rate_shock_scenario.png)
-![](docs\analysis\scenarios\bad_rate_impact.png)
-![](docs\analysis\scenarios\bad_time_analysis.png)
-![](docs\analysis\scenarios\bad_spread_impact.png)
+![bad_rate_shock_scenario](https://github.com/user-attachments/assets/6938b63a-907e-463a-b127-2014edff74ad)
+![bad_rate_impact](https://github.com/user-attachments/assets/4f3aad98-aa06-4f46-99c5-fb6459e33788)
+![bad_spread_impact](https://github.com/user-attachments/assets/5b15a425-de3f-41e9-8a12-1d95c83fa951)
+![bad_time_analysis](https://github.com/user-attachments/assets/9cd0c262-39f8-4b5b-811f-e249a0ac6016)
 
 - 금리 상승 시 손실 크기는 만기가 길수록 커짐
 - 금리 상승 기간이 늘어날수록 스트레스 강도가 위와 같이 상승함
 - 단기채와 장기채는 스프레드가 증가하나 중기채는 스프레드가 축소됨
 
 #### WORST 시나리오 분석 결과
-![](docs\analysis\scenarios\worst_detailed_components.png)
-![](docs\analysis\scenarios\worst_risk_evolution.png)
+![worst_detailed_components](https://github.com/user-attachments/assets/2103c646-6e67-4df1-abf9-a5562de8be30)
+![worst_risk_evolution](https://github.com/user-attachments/assets/822cc5a0-59dc-468f-8e47-bf0f845a01e1)
 
 - 장기물일수록 금리리스크와 신용리스크에 취약
 - 위기 지속 시 손실 규모가 비선형적으로 증가
