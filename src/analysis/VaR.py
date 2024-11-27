@@ -8,7 +8,7 @@ from src.utils.db_queries import WooriBondDB
 
 @dataclass
 class VaRAnalysisResult:
-    """확장된 VaR 분석 결과 클래스"""
+    """VaR 분석 결과 클래스"""
 
     position_size: float
     current_value: float
