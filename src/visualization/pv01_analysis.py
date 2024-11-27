@@ -31,7 +31,7 @@ class PV01Visualization:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     def plot_pv01_by_maturity(self, save=True):
-        """만기별 PV01 분포 시각화 (개선된 버전)"""
+        """만기별 PV01 분포 시각화"""
         pv01_data = self.analysis.calculate_portfolio_pv01()
 
         fig, ax = plt.subplots(figsize=(15, 8))
