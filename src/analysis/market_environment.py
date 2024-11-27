@@ -20,7 +20,7 @@ class MarketEnvironmentAnalysis:
     def analyze_yield_curve(self, dates=None):
         """국고채 금리 곡선 분석"""
         if dates is None:
-            # 최근 3개 시점 선택
+            # 최근 3개 시점 선택(중복 제거)
             dates = sorted(self.govt_bond_data["일자"].unique())[-3:]
 
         yield_curves = {}
@@ -29,6 +29,7 @@ class MarketEnvironmentAnalysis:
         for date in dates:
             daily_data = self.govt_bond_data[self.govt_bond_data["일자"] == date]
             yield_curves[date] = daily_data[tenors].iloc[0]
+            # DataFrame의 첫 번째 행을 선택하는 메서드
 
         return pd.DataFrame(yield_curves).T
 

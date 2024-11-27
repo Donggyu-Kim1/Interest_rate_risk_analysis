@@ -276,10 +276,78 @@ erDiagram
     - 신용스프레드 분석
     - 금리 변동성 분석
 
+```python
+# 금리 곡선을 위한 데이터 추출
+for date in dates:
+    daily_data = self.govt_bond_data[self.govt_bond_data["일자"] == date]
+    yield_curves[date] = daily_data[tenors].iloc[0]
+
+
+# 1. 스프레드 계산식
+merged_data["스프레드"] = (
+    merged_data["채권평가사 평균수익률_수익률"] - govt_rate
+)
+
+# 2. 데이터 결합
+maturity_spreads = self.spread_data.merge(
+    self.bond_info[["종목명", "만기그룹"]], on="종목명"
+)
+
+# 3. 만기그룹별 평균 스프레드 계산
+spread_analysis = (
+    maturity_spreads.groupby(["일자", "만기그룹"])["스프레드"]
+    .mean()
+    .reset_index()
+)
+
+# 금리 변동성 분석
+for tenor in tenors:
+    # 일간 변화율 계산
+    daily_changes = self.govt_bond_data[tenor].pct_change()
+
+    # 이동 표준편차 계산 (연율화)
+    volatility = daily_changes.rolling(window=window).std() * np.sqrt(252)
+    volatility_df[f"{tenor}_변동성"] = volatility
+
+volatility_df.index = self.govt_bond_data["일자"]
+```
+
 - PV01 분석
     - 채권별 현금흐름 산출
     - 금리 민감도 계산
     - 만기별 PV01 비교
+
+```python
+# 이자지급주기에 따라 payment_dates 생성
+payment_dates = pd.date_range(
+    start=start_date, end=end_date, freq=f"{payment_freq}ME"
+)
+
+cashflows = []
+
+# 각 지급일의 이자금액 = 발행액 × (쿠폰이자 / 연간 지급횟수)
+for date in payment_dates:
+    cf = principal * (coupon_rate / (12 / payment_freq))
+    # 만기일에는 이자 + 원금
+    if date == end_date:
+        cf += principal
+
+shock = 0.0001  # 1bp
+
+for _, cf in cashflows.iterrows():
+    t = cf["days_to_cf"] / 365
+    if t > 0:
+        # 각 현금흐름을 시장금리로 할인
+        pv_base = cf["amount"] / (1 + market_rate) ** t
+        pv_shock = cf["amount"] / (1 + market_rate + shock) ** t
+
+        total_pv_base += pv_base
+        total_pv_shock += pv_shock  # 1bp 올린 현재가치 계산
+
+# PV01 = -(1bp 오른 현재가치 - 기본 현재가치)
+# 금리는 bp가 상승하면 가격은 하락 -> 음수, 양수 계산을 위해 마이너스 기호 붙임
+return -(total_pv_shock - total_pv_base)
+```
 
 - 시나리오 분석
     - 역사적 시나리오: 코로나19, 인플레이션 & 유동성 충격
@@ -289,10 +357,100 @@ erDiagram
         - Worst : Bad 상황 + 기업 부실화로 인한 신용리스크 확대
     - 복합 리스크 요인 분석
 
+```python
+# 시나리오 설정
+
+# Baseline
+if maturity <= 2:
+    rate_change = -0.0025  # -25bp
+elif maturity <= 5:
+    rate_change = -0.0020  # -20bp
+else:
+    rate_change = -0.0015  # -15bp
+
+# Bad
+if maturity <= 2:
+    rate_shock = 0.01  # 100bp
+elif maturity <= 5:
+    rate_shock = 0.0075  # 75bp
+else:
+    rate_shock = 0.005  # 50bp
+
+# Worst(Bad + a)
+# 극단적 신용경색 상황의 스프레드 확대
+if maturity <= 2:
+    spread_widening = np.random.uniform(0.006, 0.008)  # 60-80bp
+elif maturity <= 5:
+    spread_widening = np.random.uniform(0.010, 0.012)  # 100-120bp
+else:
+    spread_widening = np.random.uniform(0.015, 0.018)  # 150-180bp
+
+# 심화된 유동성 프리미엄 (시장 경색 반영)
+base_liquidity_premium = (maturity / 10) * 0.004  # 기본 유동성 프리미엄
+
+# 유동성 부족으로 인한 추가 할인율 적용
+illiquidity_discount = 0.05 + (maturity / 20)  # 5%~10% 할인
+
+market_stress_factor = 1 + (
+    current_spread * 0.1
+)  # 현재 스프레드가 높을수록 스트레스 가중
+
+# 복합 리스크 요인 분석
+# 금리충격과 신용위기 효과를 결합 후 상호작용 효과 30% 적용
+total_results["상호작용효과"] = (
+    total_results["금리충격손실"] * total_results["신용리스크손실"] * 0.3
+)
+
+# 부도위험가중치: 만기가 길수록, 할인율이 높을수록 증가
+total_results["부도위험가중치"] = total_results.apply(
+    lambda x: 1 + (x["만기"] / 5) * (1 + x["할인율"]), axis=1
+)
+
+# 최종손실 = (금리충격손실 + 총손실 + 상호작용효과) × 부도위험가중치
+total_results["최종위험조정손실"] = (total_results["금리충격손실"] + total_results["총손실"] + total_results["상호작용효과"]) * total_results["부도위험가중치"]
+```
+
 - VaR 분석
     - 몬테카를로 시뮬레이션
     - 신뢰수준별 최대손실액 추정
     - Expected Shortfall 계산
+
+```python
+# 정규성 검정(normaltest메서드 사용)
+normality_test = stats.normaltest(returns)
+
+# 기각 시 t-분포 사용
+df = 5  # 자유도
+simulated_returns = stats.t.rvs(
+    df=df,
+    loc=mean_return * horizon_days,
+    scale=std_return * np.sqrt(horizon_days),
+    size=n_simulations,
+)
+
+# 포트폴리오 가치 계산
+current_value = current_price * position_size
+simulated_values = current_price * (1 + simulated_returns) * position_size
+
+# VaR : 하위 5%, 1%에서의 최대 예상 손실
+var_95 = abs(current_value - np.percentile(simulated_values, 5))
+var_99 = abs(current_value - np.percentile(simulated_values, 1))
+
+# ES 계산
+# 5%, 1% 백분위수(95% VaR, 99% VaR) 계산
+cutoff_95 = np.percentile(simulated_values, 5)
+cutoff_99 = np.percentile(simulated_values, 1)
+
+# VaR 이하의 모든 값들을 선택 : simulated_values[simulated_values <= cutoff_95]
+# 현재가치와 선택된 값들의 평균의 차
+# => 최악의 5%, 1% 상황에서의 평균 손실
+es_95 = abs(
+    current_value - np.mean(simulated_values[simulated_values <= cutoff_95])
+)
+es_99 = abs(
+    current_value - np.mean(simulated_values[simulated_values <= cutoff_99])
+)
+```
 
 ## 7. 분석 결과
 

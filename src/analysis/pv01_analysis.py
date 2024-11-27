@@ -62,6 +62,7 @@ class PV01Analysis:
         for _, cf in cashflows.iterrows():
             t = cf["days_to_cf"] / 365
             if t > 0:
+                # 각 현금흐름을 시장금리로 할인
                 pv_base = cf["amount"] / (1 + market_rate) ** t
                 pv_shock = cf["amount"] / (1 + market_rate + shock) ** t
 
